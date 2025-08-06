@@ -12,7 +12,7 @@ pipeline {
             }
             agent { label 'test' }
             steps {
-                echo "Deploying to Test Node..."
+                echo "📦 Deploying to Test..."
                 sh '''
                     rm -rf /home/ubuntu/jenkins/test/
                     mkdir -p /home/ubuntu/jenkins/test/
@@ -27,7 +27,7 @@ pipeline {
             }
             agent { label 'prod' }
             steps {
-                echo "Deploying to Prod Node..."
+                echo "🚀 Deploying to Prod..."
                 sh '''
                     rm -rf /home/ubuntu/jenkins/prod/
                     mkdir -p /home/ubuntu/jenkins/prod/
@@ -39,10 +39,10 @@ pipeline {
 
     post {
         success {
-            echo '✅ Deployment successful!'
+            echo '✅ All deployments completed successfully!'
         }
         failure {
-            echo '❌ Deployment failed!'
+            echo '❌ Deployment pipeline failed.'
         }
     }
 }
