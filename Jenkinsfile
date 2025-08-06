@@ -1,23 +1,17 @@
 pipeline {
-    agent {
-        label (env.BRANCH_NAME == 'main' ? 'prod' : 'test')
-    }
+    agent { label 'test' }
 
     stages {
-        stage('Checkout Code') {
+        stage('Checkout and Copy') {
             steps {
+                // Checkout code from SCM
                 checkout scm
-            }
-        }
 
-        stage('Store in Folder') {
-            steps {
-                echo "Copying files into pulled_files directory..."
+                // Create target folder
+                sh 'mkdir -p pulled_files'
 
-                sh '''
-                    mkdir -p pulled_files
-                    cp -r * pulled_files/
-                '''
+                // Copy all contents to the folder
+                sh 'cp -r * pulled_files/'
             }
         }
     }
