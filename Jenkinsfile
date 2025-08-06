@@ -1,25 +1,45 @@
 pipeline {
-    agent any
+  agent none
 
-    triggers {
-        githubPush()
+  triggers {
+    githubPush()
+  }
+
+  stages {
+    stage('Deploy to Test') {
+      agent { label 'test' }
+      when { branch 'develop' }
+      steps {
+        checkout scm
+        sh '''
+          echo "Deploying to Test Node..."
+          rm -rf /home/ubuntu/jenkins/test/
+          mkdir -p /home/ubuntu/jenkins/test/
+          cp -R . /home/ubuntu/jenkins/test/
+        '''
+      }
     }
 
-    stages {
-        stage('Run only when develop branch') {
-            when {
-                branch 'develop'
-            }
-            steps {
-                echo 'Checking out develop branch'
-
-                checkout scm
-
-                sh 'mkdir -p pulled_files'
-                sh 'cp -r * pulled_files/'
-
-                echo 'Files copied to pulled_files directory'
-            }
-        }
+    stage('Deploy to Prod') {
+      agent { label 'prod' }
+      steps {
+        checkout scm
+        sh '''
+          echo "Deploying to Prod Node..."
+          rm -rf /home/ubuntu/jenkins/prod/
+          mkdir -p /home/ubuntu/jenkins/prod/
+          cp -R . /home/ubuntu/jenkins/prod/
+        '''
+      }
     }
+  }
+
+  post {
+    success {
+      echo '✅ Deployment successful!'
+    }
+    failure {
+      echo '❌ Deployment failed.'
+    }
+  }
 }
