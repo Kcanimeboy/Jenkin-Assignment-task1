@@ -1,18 +1,19 @@
 pipeline {
-    agent { label 'test' }
+  agent { label 'test' }
+  stages {
+    stage('Checkout and Copy') {
+      steps {
+        checkout scm
 
-    stages {
-        stage('Checkout and Copy') {
-            steps {
-                // Checkout code from SCM
-                checkout scm
+        sh '''
+          # make sure we're starting clean
+          rm -rf pulled_files
+          mkdir -p pulled_files
 
-                // Create target folder
-                sh 'mkdir -p pulled_files'
-
-                // Copy all contents to the folder
-                sh 'cp -r * pulled_files/'
-            }
-        }
+          # sync everything except the staging dir itself
+          rsync -av --exclude='pulled_files' ./ pulled_files/
+        '''
+      }
     }
+  }
 }
