@@ -1,5 +1,5 @@
 pipeline {
-    agent { label 'test' }
+    agent { label 'prod' }
 
     stages {
         stage('Checkout and Copy') {
