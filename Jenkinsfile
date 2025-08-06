@@ -1,45 +1,48 @@
 pipeline {
-  agent none
+    agent none
 
-  triggers {
-    githubPush()
-  }
-
-  stages {
-    stage('Deploy to Test') {
-      agent { label 'test' }
-      when { branch 'develop' }
-      steps {
-        checkout scm
-        sh '''
-          echo "Deploying to Test Node..."
-          rm -rf /home/ubuntu/jenkins/test/
-          mkdir -p /home/ubuntu/jenkins/test/
-          cp -R . /home/ubuntu/jenkins/test/
-        '''
-      }
+    triggers {
+        githubPush()
     }
 
-    stage('Deploy to Prod') {
-      agent { label 'prod' }
-      steps {
-        checkout scm
-        sh '''
-          echo "Deploying to Prod Node..."
-          rm -rf /home/ubuntu/jenkins/prod/
-          mkdir -p /home/ubuntu/jenkins/prod/
-          cp -R . /home/ubuntu/jenkins/prod/
-        '''
-      }
-    }
-  }
+    stages {
+        stage('Deploy to Test') {
+            when {
+                branch 'develop'
+            }
+            agent { label 'test' }
+            steps {
+                echo "Deploying to Test Node..."
+                sh '''
+                    rm -rf /home/ubuntu/jenkins/test/
+                    mkdir -p /home/ubuntu/jenkins/test/
+                    cp -R * /home/ubuntu/jenkins/test/
+                '''
+            }
+        }
 
-  post {
-    success {
-      echo '✅ Deployment successful!'
+        stage('Deploy to Prod') {
+            when {
+                branch 'develop'
+            }
+            agent { label 'prod' }
+            steps {
+                echo "Deploying to Prod Node..."
+                sh '''
+                    rm -rf /home/ubuntu/jenkins/prod/
+                    mkdir -p /home/ubuntu/jenkins/prod/
+                    cp -R * /home/ubuntu/jenkins/prod/
+                '''
+            }
+        }
     }
-    failure {
-      echo '❌ Deployment failed.'
+
+    post {
+        success {
+            echo '✅ Deployment successful!'
+        }
+        failure {
+            echo '❌ Deployment failed!'
+        }
     }
-  }
 }
